@@ -124,29 +124,62 @@ const EnvironmentalDashboard = () => {
     switch (chartType) {
       case "line":
         return (
-          <LineChart data={data}>
-            <Line yAxisId="left" type="monotone" dataKey="temperature" stroke="#ff7300" strokeWidth={2} dot={{ onClick: handlePointClick }} name="Temperature" unit="°C" />
-            <Line yAxisId="left" type="monotone" dataKey="humidity" stroke="#8884d8" strokeWidth={2} dot={{ onClick: handlePointClick }} name="Humidity" unit="%" />
-            <Bar yAxisId="right" dataKey="light" fill="#ffc658" maxBarSize={20} name="Light" unit="lux" />
-            <Line yAxisId="right" type="monotone" dataKey="co2" stroke="#82ca9d" strokeWidth={2} dot={{ onClick: handlePointClick }} name="CO2" unit="ppm" />
-          </LineChart>
+          <ResponsiveContainer width="100%" height={400}>
+            <LineChart data={data}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="time" />
+              <YAxis yAxisId="left" />
+              <YAxis yAxisId="right" orientation="right" />
+              <Tooltip />
+              <Legend />
+              <Line yAxisId="left" type="monotone" dataKey="temperature" stroke="#ff7300" strokeWidth={2} dot={{ onClick: handlePointClick }} name="Temperature" unit="°C" />
+              <Line yAxisId="left" type="monotone" dataKey="humidity" stroke="#8884d8" strokeWidth={2} dot={{ onClick: handlePointClick }} name="Humidity" unit="%" />
+              <Bar yAxisId="right" dataKey="light" fill="#ffc658" maxBarSize={20} name="Light" unit="lux" />
+              <Line yAxisId="right" type="monotone" dataKey="co2" stroke="#82ca9d" strokeWidth={2} dot={{ onClick: handlePointClick }} name="CO2" unit="ppm" />
+            </LineChart>
+          </ResponsiveContainer>
         );
       case "bar":
         return (
-          <BarChart data={data}>
-            <Bar yAxisId="left" dataKey="temperature" fill="#ff7300" name="Temperature" unit="°C" />
-            <Bar yAxisId="left" dataKey="humidity" fill="#8884d8" name="Humidity" unit="%" />
-            <Bar yAxisId="right" dataKey="light" fill="#ffc658" maxBarSize={20} name="Light" unit="lux" />
-            <Bar yAxisId="right" dataKey="co2" fill="#82ca9d" name="CO2" unit="ppm" />
-          </BarChart>
+          <ResponsiveContainer width="100%" height={400}>
+            <BarChart data={data}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="time" />
+              <YAxis yAxisId="left" />
+              <YAxis yAxisId="right" orientation="right" />
+              <Tooltip />
+              <Legend />
+              <Bar yAxisId="left" dataKey="temperature" fill="#ff7300" name="Temperature" unit="°C" />
+              <Bar yAxisId="left" dataKey="humidity" fill="#8884d8" name="Humidity" unit="%" />
+              <Bar yAxisId="right" dataKey="light" fill="#ffc658" maxBarSize={20} name="Light" unit="lux" />
+              <Bar yAxisId="right" dataKey="co2" fill="#82ca9d" name="CO2" unit="ppm" />
+            </BarChart>
+          </ResponsiveContainer>
         );
       default:
-        return <LineChart data={data}>{/* Line chart content */}</LineChart>;
+        return (
+          <ResponsiveContainer width="100%" height={400}>
+            <LineChart data={data}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="time" />
+              <YAxis yAxisId="left" />
+              <YAxis yAxisId="right" orientation="right" />
+              <Tooltip />
+              <Legend />
+              <Line yAxisId="left" type="monotone" dataKey="temperature" stroke="#ff7300" strokeWidth={2} dot={{ onClick: handlePointClick }} name="Temperature" unit="°C" />
+              <Line yAxisId="left" type="monotone" dataKey="humidity" stroke="#8884d8" strokeWidth={2} dot={{ onClick: handlePointClick }} name="Humidity" unit="%" />
+              <Bar yAxisId="right" dataKey="light" fill="#ffc658" maxBarSize={20} name="Light" unit="lux" />
+              <Line yAxisId="right" type="monotone" dataKey="co2" stroke="#82ca9d" strokeWidth={2} dot={{ onClick: handlePointClick }} name="CO2" unit="ppm" />
+            </LineChart>
+          </ResponsiveContainer>
+        );
     }
   };
 
   return (
     <div className={`p-8 bg-gray-900 text-gray-100 min-h-screen ${theme}`}>
+      <button onClick={toggleTheme} className="mb-4 p-2 bg-gray-700 text-gray-100 rounded">Toggle Theme</button>
+      <button onClick={exportChart} className="mb-4 p-2 bg-gray-700 text-gray-100 rounded">Export as Image</button>
       <h1 className="text-4xl font-bold mb-8">
         Environmental Dashboard
       </h1>
@@ -175,6 +208,10 @@ const EnvironmentalDashboard = () => {
           icon={Wind} 
           unit="ppm" 
         />
+      </div>
+      <div className="mb-4">
+        <button onClick={() => setChartType("line")} className="p-2 bg-gray-700 text-gray-100 rounded">Line Chart</button>
+        <button onClick={() => setChartType("bar")} className="p-2 bg-gray-700 text-gray-100 rounded">Bar Chart</button>
       </div>
       <Tabs
         defaultValue="correlated"
