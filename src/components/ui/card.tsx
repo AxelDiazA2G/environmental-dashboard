@@ -39,7 +39,9 @@ const CardTitle = React.forwardRef<
       className
     )}
     {...props}
-  />
+  >
+    Add your heading content here
+  </h3>
 ));
 CardTitle.displayName = "CardTitle";
 

@@ -120,61 +120,7 @@ const EnvironmentalDashboard = () => {
     });
   };
 
-  const renderChart = () => {
-    switch (chartType) {
-      case "line":
-        return (
-          <ResponsiveContainer width="100%" height={400}>
-            <LineChart data={data}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="time" />
-              <YAxis yAxisId="left" />
-              <YAxis yAxisId="right" orientation="right" />
-              <Tooltip />
-              <Legend />
-              <Line yAxisId="left" type="monotone" dataKey="temperature" stroke="#ff7300" strokeWidth={2} dot={{ onClick: handlePointClick }} name="Temperature" unit="°C" />
-              <Line yAxisId="left" type="monotone" dataKey="humidity" stroke="#8884d8" strokeWidth={2} dot={{ onClick: handlePointClick }} name="Humidity" unit="%" />
-              <Bar yAxisId="right" dataKey="light" fill="#ffc658" maxBarSize={20} name="Light" unit="lux" />
-              <Line yAxisId="right" type="monotone" dataKey="co2" stroke="#82ca9d" strokeWidth={2} dot={{ onClick: handlePointClick }} name="CO2" unit="ppm" />
-            </LineChart>
-          </ResponsiveContainer>
-        );
-      case "bar":
-        return (
-          <ResponsiveContainer width="100%" height={400}>
-            <BarChart data={data}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="time" />
-              <YAxis yAxisId="left" />
-              <YAxis yAxisId="right" orientation="right" />
-              <Tooltip />
-              <Legend />
-              <Bar yAxisId="left" dataKey="temperature" fill="#ff7300" name="Temperature" unit="°C" />
-              <Bar yAxisId="left" dataKey="humidity" fill="#8884d8" name="Humidity" unit="%" />
-              <Bar yAxisId="right" dataKey="light" fill="#ffc658" maxBarSize={20} name="Light" unit="lux" />
-              <Bar yAxisId="right" dataKey="co2" fill="#82ca9d" name="CO2" unit="ppm" />
-            </BarChart>
-          </ResponsiveContainer>
-        );
-      default:
-        return (
-          <ResponsiveContainer width="100%" height={400}>
-            <LineChart data={data}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="time" />
-              <YAxis yAxisId="left" />
-              <YAxis yAxisId="right" orientation="right" />
-              <Tooltip />
-              <Legend />
-              <Line yAxisId="left" type="monotone" dataKey="temperature" stroke="#ff7300" strokeWidth={2} dot={{ onClick: handlePointClick }} name="Temperature" unit="°C" />
-              <Line yAxisId="left" type="monotone" dataKey="humidity" stroke="#8884d8" strokeWidth={2} dot={{ onClick: handlePointClick }} name="Humidity" unit="%" />
-              <Bar yAxisId="right" dataKey="light" fill="#ffc658" maxBarSize={20} name="Light" unit="lux" />
-              <Line yAxisId="right" type="monotone" dataKey="co2" stroke="#82ca9d" strokeWidth={2} dot={{ onClick: handlePointClick }} name="CO2" unit="ppm" />
-            </LineChart>
-          </ResponsiveContainer>
-        );
-    }
-  };
+
 
   return (
     <div className={`p-8 bg-gray-900 text-gray-100 min-h-screen ${theme}`}>
