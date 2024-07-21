@@ -1,14 +1,26 @@
 import React, { useState, useEffect } from "react";
 import { Thermometer, Activity } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "./components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/ui/tabs";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "./components/ui/card.tsx";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "./components/ui/tabs.tsx";
 import SingleMetricChart from "./SingleMetricChart";
 import CombinedEnvironmentalChart from "./CombinedEnvironmentalChart";
 import html2canvas from "html2canvas";
 
 // Updated fetch functions for temperature and motion data by day
 const fetchTemperatureByDay = async () => {
-  const response = await fetch("https://desolate-escarpment-33883-fa3df39ce07e.herokuapp.com/data/temperature/by-day");
+  const response = await fetch(
+    "https://desolate-escarpment-33883-fa3df39ce07e.herokuapp.com/data/temperature/by-day"
+  );
   if (!response.ok) {
     throw new Error("Failed to fetch temperature data by day");
   }
@@ -16,7 +28,9 @@ const fetchTemperatureByDay = async () => {
 };
 
 const fetchMotionByDay = async () => {
-  const response = await fetch("https://desolate-escarpment-33883-fa3df39ce07e.herokuapp.com/data/motion/by-day");
+  const response = await fetch(
+    "https://desolate-escarpment-33883-fa3df39ce07e.herokuapp.com/data/motion/by-day"
+  );
   if (!response.ok) {
     throw new Error("Failed to fetch motion data by day");
   }
@@ -56,8 +70,14 @@ const EnvironmentalDashboard = () => {
         setTemperatureData(fetchedTemperatureData);
         setMotionData(fetchedMotionData);
         setCurrentData({
-          temperature: fetchedTemperatureData.length > 0 ? fetchedTemperatureData[0].avg_temperature : 0,
-          motion: fetchedMotionData.length > 0 ? fetchedMotionData[0].motion_count : 0,
+          temperature:
+            fetchedTemperatureData.length > 0
+              ? fetchedTemperatureData[0].avg_temperature
+              : 0,
+          motion:
+            fetchedMotionData.length > 0
+              ? fetchedMotionData[0].motion_count
+              : 0,
         });
       } catch (error) {
         console.error("Failed to fetch data:", error);
@@ -164,7 +184,10 @@ const EnvironmentalDashboard = () => {
           />
         </TabsContent>
         <TabsContent value="combined">
-          <CombinedEnvironmentalChart temperatureData={temperatureData} motionData={motionData} />
+          <CombinedEnvironmentalChart
+            temperatureData={temperatureData}
+            motionData={motionData}
+          />
         </TabsContent>
       </Tabs>
     </div>
