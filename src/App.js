@@ -50,7 +50,7 @@ const DataCard = ({ title, value, icon: Icon, unit }) => (
     </CardContent>
   </Card>
 );
-
+//test
 const EnvironmentalDashboard = () => {
   const [temperatureData, setTemperatureData] = useState([]);
   const [motionData, setMotionData] = useState([]);
