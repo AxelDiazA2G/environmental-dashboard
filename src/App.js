@@ -6,36 +6,22 @@ import SingleMetricChart from "./SingleMetricChart";
 import CombinedEnvironmentalChart from "./CombinedEnvironmentalChart";
 import html2canvas from "html2canvas";
 
-const fetchTemperatureData = () => {
-  const baseTemperature = 28; // Base temperature in Celsius
-  return Array(24)
-    .fill()
-    .map((_, i) => {
-      const hour = i;
-      const temperatureVariation = Math.sin(((hour - 5) * Math.PI) / 12) * 10; // Greater variation
-      const temperature =
-        baseTemperature + temperatureVariation + (Math.random() - 0.5) * 2;
-
-      return {
-        time: `${String(hour).padStart(2, "0")}:00`,
-        temperature: Math.round(temperature * 10) / 10,
-      };
-    });
+// Fetch temperature data from the API
+const fetchTemperatureData = async () => {
+  const response = await fetch("https://desolate-escarpment-33883-fa3df39ce07e.herokuapp.com/data/temperature");
+  if (!response.ok) {
+    throw new Error("Failed to fetch temperature data");
+  }
+  return response.json();
 };
 
-const fetchMotionData = () => {
-  return Array(24)
-    .fill()
-    .map((_, i) => {
-      const hour = i;
-      const isDaytime = hour >= 6 && hour < 18;
-      const activityLevel = isDaytime ? Math.random() * 100 : Math.random() * 10; // Higher activity during daytime
-
-      return {
-        time: `${String(hour).padStart(2, "0")}:00`,
-        motion: Math.round(activityLevel),
-      };
-    });
+// Fetch motion data from the API (you need to provide the endpoint)
+const fetchMotionData = async () => {
+  const response = await fetch("https://desolate-escarpment-33883-fa3df39ce07e.herokuapp.com/data/motion");
+  if (!response.ok) {
+    throw new Error("Failed to fetch motion data");
+  }
+  return response.json();
 };
 
 const DataCard = ({ title, value, icon: Icon, unit }) => (
@@ -71,8 +57,8 @@ const EnvironmentalDashboard = () => {
         setTemperatureData(fetchedTemperatureData);
         setMotionData(fetchedMotionData);
         setCurrentData({
-          temperature: fetchedTemperatureData[fetchedTemperatureData.length - 1].temperature,
-          motion: fetchedMotionData[fetchedMotionData.length - 1].motion,
+          temperature: fetchedTemperatureData.length > 0 ? fetchedTemperatureData[fetchedTemperatureData.length - 1].temperature : 0,
+          motion: fetchedMotionData.length > 0 ? fetchedMotionData[fetchedMotionData.length - 1].motion : 0,
         });
       } catch (error) {
         console.error("Failed to fetch data:", error);
