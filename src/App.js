@@ -1,50 +1,39 @@
 import React, { useState, useEffect } from "react";
-import { Sun, Droplets, Thermometer, Wind } from "lucide-react";
+import { Thermometer } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "./components/ui/card.tsx";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/ui/tabs.tsx";
-import CorrelatedEnvironmentalChart from "./CorrelatedEnvironmentalChart";
-import CombinedEnvironmentalChart from "./CombinedEnvironmentalChart";
 import SingleMetricChart from "./SingleMetricChart";
+import CombinedEnvironmentalChart from "./CombinedEnvironmentalChart";
 import html2canvas from "html2canvas";
 
-const fetchData = () => {
-  const baseTemperature = 28; // Base temperature in Celsius for summer in Orlando
-  const baseHumidity = 70; // Base humidity percentage in summer
-  const baseCO2 = 400; // Base CO2 level in ppm
+const fetchTemperatureData = () => {
+  const baseTemperature = 28; // Base temperature in Celsius
+  return Array(24)
+    .fill()
+    .map((_, i) => {
+      const hour = i;
+      const temperatureVariation = Math.sin(((hour - 5) * Math.PI) / 12) * 10; // Greater variation
+      const temperature =
+        baseTemperature + temperatureVariation + (Math.random() - 0.5) * 2;
 
+      return {
+        time: `${String(hour).padStart(2, "0")}:00`,
+        temperature: Math.round(temperature * 10) / 10,
+      };
+    });
+};
+
+const fetchMotionData = () => {
   return Array(24)
     .fill()
     .map((_, i) => {
       const hour = i;
       const isDaytime = hour >= 6 && hour < 18;
-
-      const temperatureVariation = Math.sin(((hour - 5) * Math.PI) / 12) * 10; // Greater variation
-      const temperature =
-        baseTemperature + temperatureVariation + (Math.random() - 0.5) * 2;
-
-      const humidityVariation = -Math.sin(((hour - 5) * Math.PI) / 12) * 20; // Greater variation
-      const humidity =
-        baseHumidity + humidityVariation + (Math.random() - 0.5) * 5;
-
-      let light;
-      if (isDaytime) {
-        light =
-          Math.sin(((hour - 6) * Math.PI) / 12) * 1000 +
-          200 +
-          Math.random() * 100;
-      } else {
-        light = Math.random() * 10; // Moonlight and artificial light
-      }
-
-      const co2Variation = isDaytime ? 150 : 75; // More significant variation
-      const co2 = baseCO2 + co2Variation + (Math.random() - 0.5) * 30;
+      const activityLevel = isDaytime ? Math.random() * 100 : Math.random() * 10; // Higher activity during daytime
 
       return {
         time: `${String(hour).padStart(2, "0")}:00`,
-        temperature: Math.round(temperature * 10) / 10,
-        humidity: Math.round(humidity * 10) / 10,
-        light: Math.round(light),
-        co2: Math.round(co2),
+        motion: Math.round(activityLevel),
       };
     });
 };
@@ -64,12 +53,11 @@ const DataCard = ({ title, value, icon: Icon, unit }) => (
 );
 
 const EnvironmentalDashboard = () => {
-  const [data, setData] = useState([]);
+  const [temperatureData, setTemperatureData] = useState([]);
+  const [motionData, setMotionData] = useState([]);
   const [currentData, setCurrentData] = useState({
     temperature: 0,
-    humidity: 0,
-    light: 0,
-    co2: 0,
+    motion: 0,
   });
   const [isLoading, setIsLoading] = useState(true);
   const [theme, setTheme] = useState("dark");
@@ -78,9 +66,14 @@ const EnvironmentalDashboard = () => {
     const fetchDataAndSetState = async () => {
       setIsLoading(true);
       try {
-        const fetchedData = await fetchData(); // Assume this becomes an async call in the future
-        setData(fetchedData);
-        setCurrentData(fetchedData[fetchedData.length - 1]);
+        const fetchedTemperatureData = await fetchTemperatureData();
+        const fetchedMotionData = await fetchMotionData();
+        setTemperatureData(fetchedTemperatureData);
+        setMotionData(fetchedMotionData);
+        setCurrentData({
+          temperature: fetchedTemperatureData[fetchedTemperatureData.length - 1].temperature,
+          motion: fetchedMotionData[fetchedMotionData.length - 1].motion,
+        });
       } catch (error) {
         console.error("Failed to fetch data:", error);
         // Handle error state here
@@ -137,30 +130,17 @@ const EnvironmentalDashboard = () => {
           unit="°C"
         />
         <DataCard
-          title="Humidity"
-          value={currentData.humidity}
-          icon={Droplets}
-          unit="%"
+          title="Motion"
+          value={currentData.motion}
+          icon={Thermometer} // Placeholder icon for motion
+          unit="Activity Level"
         />
-        <DataCard
-          title="Light"
-          value={currentData.light}
-          icon={Sun}
-          unit="lux"
-        />
-        <DataCard title="CO2" value={currentData.co2} icon={Wind} unit="ppm" />
       </div>
       <Tabs
-        defaultValue="correlated"
+        defaultValue="temperature"
         className="bg-gray-800 text-gray-100 rounded-lg p-6"
       >
         <TabsList className="border-b border-gray-700 mb-4">
-          <TabsTrigger
-            value="correlated"
-            className="text-gray-300 hover:text-white"
-          >
-            Correlated
-          </TabsTrigger>
           <TabsTrigger
             value="temperature"
             className="text-gray-300 hover:text-white"
@@ -168,16 +148,10 @@ const EnvironmentalDashboard = () => {
             Temperature
           </TabsTrigger>
           <TabsTrigger
-            value="humidity"
+            value="motion"
             className="text-gray-300 hover:text-white"
           >
-            Humidity
-          </TabsTrigger>
-          <TabsTrigger value="light" className="text-gray-300 hover:text-white">
-            Light
-          </TabsTrigger>
-          <TabsTrigger value="co2" className="text-gray-300 hover:text-white">
-            CO2
+            Motion
           </TabsTrigger>
           <TabsTrigger
             value="combined"
@@ -186,43 +160,24 @@ const EnvironmentalDashboard = () => {
             Combined
           </TabsTrigger>
         </TabsList>
-        <TabsContent value="correlated">
-          <CorrelatedEnvironmentalChart data={data} />
-        </TabsContent>
         <TabsContent value="temperature">
           <SingleMetricChart
-            data={data}
+            data={temperatureData}
             metric="temperature"
             color="#ff7300"
             unit="°C"
           />
         </TabsContent>
-        <TabsContent value="humidity">
+        <TabsContent value="motion">
           <SingleMetricChart
-            data={data}
-            metric="humidity"
-            color="#8884d8"
-            unit="%"
-          />
-        </TabsContent>
-        <TabsContent value="light">
-          <SingleMetricChart
-            data={data}
-            metric="light"
-            color="#ffc658"
-            unit="lux"
-          />
-        </TabsContent>
-        <TabsContent value="co2">
-          <SingleMetricChart
-            data={data}
-            metric="co2"
+            data={motionData}
+            metric="motion"
             color="#82ca9d"
-            unit="ppm"
+            unit="Activity Level"
           />
         </TabsContent>
         <TabsContent value="combined">
-          <CombinedEnvironmentalChart data={data} />
+          <CombinedEnvironmentalChart temperatureData={temperatureData} motionData={motionData} />
         </TabsContent>
       </Tabs>
     </div>
