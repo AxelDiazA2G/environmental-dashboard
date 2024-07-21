@@ -1,25 +1,24 @@
 import React, { useState, useEffect } from "react";
-import { Thermometer } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "./components/ui/card.tsx";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/ui/tabs.tsx";
+import { Thermometer, Activity } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "./components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/ui/tabs";
 import SingleMetricChart from "./SingleMetricChart";
 import CombinedEnvironmentalChart from "./CombinedEnvironmentalChart";
 import html2canvas from "html2canvas";
 
-// Fetch temperature data from the API
-const fetchTemperatureData = async () => {
-  const response = await fetch("https://desolate-escarpment-33883-fa3df39ce07e.herokuapp.com/data/temperature");
+// Updated fetch functions for temperature and motion data by day
+const fetchTemperatureByDay = async () => {
+  const response = await fetch("https://desolate-escarpment-33883-fa3df39ce07e.herokuapp.com/data/temperature/by-day");
   if (!response.ok) {
-    throw new Error("Failed to fetch temperature data");
+    throw new Error("Failed to fetch temperature data by day");
   }
   return response.json();
 };
 
-// Fetch motion data from the API (you need to provide the endpoint)
-const fetchMotionData = async () => {
-  const response = await fetch("https://desolate-escarpment-33883-fa3df39ce07e.herokuapp.com/data/motion");
+const fetchMotionByDay = async () => {
+  const response = await fetch("https://desolate-escarpment-33883-fa3df39ce07e.herokuapp.com/data/motion/by-day");
   if (!response.ok) {
-    throw new Error("Failed to fetch motion data");
+    throw new Error("Failed to fetch motion data by day");
   }
   return response.json();
 };
@@ -52,13 +51,13 @@ const EnvironmentalDashboard = () => {
     const fetchDataAndSetState = async () => {
       setIsLoading(true);
       try {
-        const fetchedTemperatureData = await fetchTemperatureData();
-        const fetchedMotionData = await fetchMotionData();
+        const fetchedTemperatureData = await fetchTemperatureByDay();
+        const fetchedMotionData = await fetchMotionByDay();
         setTemperatureData(fetchedTemperatureData);
         setMotionData(fetchedMotionData);
         setCurrentData({
-          temperature: fetchedTemperatureData.length > 0 ? fetchedTemperatureData[fetchedTemperatureData.length - 1].temperature : 0,
-          motion: fetchedMotionData.length > 0 ? fetchedMotionData[fetchedMotionData.length - 1].motion : 0,
+          temperature: fetchedTemperatureData.length > 0 ? fetchedTemperatureData[0].avg_temperature : 0,
+          motion: fetchedMotionData.length > 0 ? fetchedMotionData[0].motion_count : 0,
         });
       } catch (error) {
         console.error("Failed to fetch data:", error);
@@ -110,16 +109,16 @@ const EnvironmentalDashboard = () => {
       <h1 className="text-4xl font-bold mb-8">Environmental Dashboard</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         <DataCard
-          title="Temperature"
+          title="Average Temperature (Today)"
           value={currentData.temperature}
           icon={Thermometer}
           unit="°C"
         />
         <DataCard
-          title="Motion"
+          title="Motion Events (Today)"
           value={currentData.motion}
-          icon={Thermometer} // Placeholder icon for motion
-          unit="Activity Level"
+          icon={Activity}
+          unit="Events"
         />
       </div>
       <Tabs
@@ -149,17 +148,19 @@ const EnvironmentalDashboard = () => {
         <TabsContent value="temperature">
           <SingleMetricChart
             data={temperatureData}
-            metric="temperature"
+            metric="avg_temperature"
             color="#ff7300"
             unit="°C"
+            xAxisDataKey="date"
           />
         </TabsContent>
         <TabsContent value="motion">
           <SingleMetricChart
             data={motionData}
-            metric="motion"
+            metric="motion_count"
             color="#82ca9d"
-            unit="Activity Level"
+            unit="Events"
+            xAxisDataKey="date"
           />
         </TabsContent>
         <TabsContent value="combined">
