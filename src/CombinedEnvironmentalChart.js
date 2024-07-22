@@ -1,31 +1,41 @@
 import React from 'react';
-import { ResponsiveContainer, ComposedChart, Line, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, Area } from 'recharts';
+import { ResponsiveContainer, ComposedChart, Line, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 
-const CombinedEnvironmentalChart = ({ data }) => {
-  // Preprocess data to add a "dayNight" property
-  const processedData = data.map(item => ({
-    ...item,
-    dayNight: parseInt(item.time.split(':')[0]) >= 6 && parseInt(item.time.split(':')[0]) < 18 ? 'Day' : 'Night'
-  }));
+const CombinedEnvironmentalChart = ({ temperatureData, motionData }) => {
+  // Combine temperature and motion data
+  const combinedData = temperatureData.map(tempItem => {
+    // Find corresponding motion data
+    const motionItem = motionData.find(motionItem => motionItem.date === tempItem.date);
+    return {
+      date: tempItem.date,
+      temperature: parseFloat(tempItem.average_temp), // Use correct key from data
+      motion: motionItem ? parseInt(motionItem.motion_count, 10) : 0 // Ensure correct parsing
+    };
+  });
 
   return (
     <ResponsiveContainer width="100%" height={500}>
-      <ComposedChart data={processedData}>
+      <ComposedChart data={combinedData}>
         <CartesianGrid strokeDasharray="3 3" />
-        <XAxis dataKey="time" />
-        <YAxis yAxisId="left" />
-        <YAxis yAxisId="right" orientation="right" />
+        <XAxis 
+          dataKey="date" 
+          angle={-45}
+          textAnchor="end"
+          height={70}
+          interval={0}
+          tick={{ fontSize: 12 }}
+        />
+        <YAxis 
+          yAxisId="left" 
+          label={{ value: 'Temperature (°C)', angle: -90, position: 'insideLeft' }}
+        />
+        <YAxis 
+          yAxisId="right" 
+          orientation="right" 
+          label={{ value: 'Motion Events', angle: 90, position: 'insideRight' }}
+        />
         <Tooltip />
         <Legend />
-        
-        {/* Day/Night indicator */}
-        <Area 
-          type="monotone" 
-          dataKey="dayNight" 
-          fill="#f3f4f6" 
-          stroke="#d1d5db"
-          yAxisId="left"
-        />
         
         {/* Temperature */}
         <Line 
@@ -34,33 +44,17 @@ const CombinedEnvironmentalChart = ({ data }) => {
           stroke="#ef4444" 
           yAxisId="left"
           dot={false}
+          name="Temperature"
         />
         
-        {/* Humidity */}
-        <Line 
-          type="monotone" 
-          dataKey="humidity" 
-          stroke="#3b82f6" 
-          yAxisId="left"
-          dot={false}
-        />
-        
-        {/* Light */}
+        {/* Motion */}
         <Bar 
-          dataKey="light" 
-          fill="#fbbf24" 
+          dataKey="motion" 
+          fill="#3b82f6" 
           yAxisId="right" 
           barSize={20} 
           opacity={0.8}
-        />
-        
-        {/* CO2 */}
-        <Line 
-          type="monotone" 
-          dataKey="co2" 
-          stroke="#10b981" 
-          yAxisId="right"
-          dot={false}
+          name="Motion Events"
         />
       </ComposedChart>
     </ResponsiveContainer>
